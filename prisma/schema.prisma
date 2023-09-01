@@ -9,3 +9,153 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AppointmentStatus {
+  Scheduled
+  Completed
+  Canceled
+}
+
+enum TreatmentStatus {
+  Scheduled
+  Started
+  Completed
+  Canceled
+}
+
+model Person {
+  id         String   @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  first_name String
+  last_name  String
+  phone      String
+  address    String
+  createdAt  DateTime @default(now()) //default value (now)
+  updatedAt  DateTime @updatedAt //auto update this field on update
+  //One to one relationship
+  user       User?
+  patient    Patient?
+  Dentist    Dentist?
+  Staff      Staff?
+
+  //LOCK LEVEL ATTRIBUTE
+  @@index([phone]) // index this field for faster queries when filtering and sorting
+}
+
+model User {
+  id         String      @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  email      String      @unique // @unique sets the field as unique
+  user_name  String      @unique
+  role       Role        @default(USER)
+  //One to one relationship
+  person     Person      @relation(fields: [person_id], references: [id])
+  person_id  String      @unique
+  createdAt  DateTime    @default(now()) //default value (now)
+  updatedAt  DateTime    @updatedAt //auto update this field on update
+  //One to Many
+  payments   Payment[]
+  evolutions Evolution[]
+
+  //LOCK LEVEL ATTRIBUTE
+  @@index([email]) // index this field for faster queries when filtering and sorting
+  @@index([user_name]) // index this field for faster queries when filtering and sorting
+}
+
+model Patient {
+  id           String        @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  //One to one relationship
+  person       Person        @relation(fields: [person_id], references: [id])
+  person_id    String        @unique
+  createdAt    DateTime      @default(now()) //default value (now)
+  updatedAt    DateTime      @updatedAt //auto update this field on update
+  //One to Many
+  appointments Appointment[]
+  dentists     Dentist[]
+  Treatment    Treatment[]
+}
+
+model Dentist {
+  id             String       @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  //One to one relationship
+  person         Person       @relation(fields: [person_id], references: [id])
+  person_id      String       @unique
+  specialization String
+  createdAt      DateTime     @default(now()) //default value (now)
+  updatedAt      DateTime     @updatedAt //auto update this field on update
+  Patient        Patient      @relation(fields: [patientId], references: [id])
+  patientId      String
+  Appointment    Appointment?
+  Treatment      Treatment?
+}
+
+model Staff {
+  id             String   @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  //One to one relationship
+  person         Person   @relation(fields: [person_id], references: [id])
+  person_id      String   @unique
+  specialization String
+  createdAt      DateTime @default(now()) //default value (now)
+  updatedAt      DateTime @updatedAt //auto update this field on update
+}
+
+model Appointment {
+  id               String            @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  specialization   String
+  appointment_date DateTime
+  description      String
+  status           AppointmentStatus @default(Scheduled)
+  createdAt        DateTime          @default(now()) //default value (now)
+  updatedAt        DateTime          @updatedAt //auto update this field on update
+  //One to one relationship
+  patient          Patient           @relation(fields: [patient_id], references: [id])
+  patient_id       String            @unique
+  dentist          Dentist           @relation(fields: [dentist_id], references: [id])
+  dentist_id       String            @unique
+}
+
+model Treatment {
+  id                    String          @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  treatment_date        DateTime
+  procedure_description String
+  status                TreatmentStatus @default(Scheduled)
+  cost                  Decimal
+  createdAt             DateTime        @default(now()) //default value (now)
+  updatedAt             DateTime        @updatedAt //auto update this field on update
+  //One to one relationship
+  patient               Patient         @relation(fields: [patient_id], references: [id])
+  patient_id            String          @unique
+  dentist               Dentist         @relation(fields: [dentist_id], references: [id])
+  dentist_id            String          @unique
+  //one to many
+  evolutions            Evolution[]
+  Payment               Payment[]
+}
+
+model Evolution {
+  id          String    @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  comment     String
+  createdAt   DateTime  @default(now()) //default value (now)
+  updatedAt   DateTime  @updatedAt //auto update this field on update
+  //One to one relationship
+  user        User      @relation(fields: [user_id], references: [id])
+  user_id     String    @unique
+  Treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  treatmentId String
+}
+
+model Payment {
+  id          String    @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  amount      Decimal
+  comment     String
+  createdAt   DateTime  @default(now()) //default value (now)
+  updatedAt   DateTime  @updatedAt //auto update this field on update
+  //One to one relationship
+  user        User      @relation(fields: [user_id], references: [id])
+  user_id     String    @unique
+  Treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  treatmentId String
+}
