@@ -12,4 +12,4 @@ app.use(bodyParser.json());
 const PORT = process.env.PORT || 8788;
 
 // Listen to requests
-app.listen(PORT, () => console.log(`Welcome to Dental Clinic API. PORT ${PORT} `));
+app.listen(PORT, () => console.log(`Welcome to Dental Clinic API. Listen to PORT : ${PORT} `));
