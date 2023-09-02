@@ -1,12 +1,13 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable import/no-extraneous-dependencies */
 import express from 'express';
-import bodyParser from 'body-parser';
 // ========== ROUTES ===============
 
 const app = express();
 
 // ========== MIDDLEWARES ==============
 // Middleware for parsing JSON in requests
-app.use(bodyParser.json());
+app.use(express.json());
 
 const PORT = process.env.PORT || 8788;
 
