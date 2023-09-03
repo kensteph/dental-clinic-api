@@ -51,6 +51,7 @@ model User {
   email      String      @unique // @unique sets the field as unique
   user_name  String      @unique
   role       Role        @default(USER)
+  password   String
   //One to one relationship
   person     Person      @relation(fields: [person_id], references: [id])
   person_id  String      @unique
