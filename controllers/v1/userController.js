@@ -14,7 +14,9 @@ const getUsers = (req, res) => {
 // Create a new user
 const createUser = async (req, res) => {
   const password = 'werrrrwwq';
-  const { firstname, lastname, email, phone, address, username } = req.body;
+  const {
+    firstname, lastname, email, phone, address, username,
+  } = req.body;
 
   const save = await prisma.user.create({
     data: {
@@ -35,15 +37,20 @@ const createUser = async (req, res) => {
   res.status(201).json({ message: 'User created', user: save });
 };
 
-// Get user by 
-const getUserById = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const user = users.find((u) => u.id === userId);
-  if (!user) {
+// Get user by username
+const getUserByUsername = async (req, res) => {
+  const {username} = req.body;
+
+  const findUser = await prisma.user.findUnique({
+    where: {
+      user_name: username,
+    },
+  })
+  if (!findUser) {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  res.json({ user });
+  res.json({ findUser });
 };
 
 // Get user by ID
@@ -86,4 +93,6 @@ const deleteUser = (req, res) => {
   res.json({ message: 'User deleted' });
 };
 
-export { getUsers, getUserById, createUser, updateUser, deleteUser };
+export {
+  getUsers, getUserById,getUserByUsername, createUser, updateUser, deleteUser,
+};
