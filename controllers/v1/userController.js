@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/extensions
 import { prisma } from '../../db/index.js';
 
 // Sample data (replace with your database interactions)
@@ -18,23 +19,26 @@ const createUser = async (req, res) => {
     firstname, lastname, email, phone, address, username,
   } = req.body;
 
-  const save = await prisma.user.create({
-    data: {
-      user_name: username,
-      email,
-      password,
-
-      person: {
-        create: {
-          first_name: firstname,
-          last_name: lastname,
-          phone,
-          address,
+  try {
+    const savedUser = await prisma.user.create({
+      data: {
+        user_name: username,
+        password,
+        person: {
+          create: {
+            first_name: firstname,
+            last_name: lastname,
+            email,
+            phone,
+            address,
+          },
         },
       },
-    },
-  });
-  res.status(201).json({ message: 'User created', user: save });
+    });
+    res.status(201).json({ message: 'User created', user: savedUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Fail to created the user' });
+  }
 };
 
 // Get user by username
@@ -50,7 +54,7 @@ const getUserByUsername = async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  res.json({ findUser });
+  return res.json({ findUser });
 };
 
 // Get user by email
@@ -66,7 +70,7 @@ const getUserByEmail = async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  res.json({ findUser });
+  return res.json({ findUser });
 };
 
 // Get user by ID
@@ -77,7 +81,7 @@ const getUserById = (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  res.json({ user });
+  return res.json({ user });
 };
 
 // Update user by ID
@@ -93,7 +97,7 @@ const updateUser = (req, res) => {
   user.name = name || user.name;
   user.email = email || user.email;
 
-  res.json({ message: 'User updated', user });
+  return res.json({ message: 'User updated', user });
 };
 
 // Delete user by ID
@@ -106,7 +110,7 @@ const deleteUser = (req, res) => {
   }
 
   users.splice(userIndex, 1);
-  res.json({ message: 'User deleted' });
+  return res.json({ message: 'User deleted' });
 };
 
 export {
