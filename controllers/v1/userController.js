@@ -41,49 +41,6 @@ const createUser = async (req, res) => {
   }
 };
 
-// Get user by username
-const getUserByUsername = async (req, res) => {
-  const { username } = req.body;
-
-  const findUser = await prisma.user.findUnique({
-    where: {
-      user_name: username,
-    },
-  });
-  if (!findUser) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  return res.json({ findUser });
-};
-
-// Get user by email
-const getUserByEmail = async (req, res) => {
-  const { email } = req.body;
-
-  const findUser = await prisma.person.findUnique({
-    where: {
-      email,
-    },
-  });
-  if (!findUser) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  return res.json({ findUser });
-};
-
-// Get user by ID
-const getUserById = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const user = users.find((u) => u.id === userId);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  return res.json({ user });
-};
-
 // Update user by ID
 const updateUser = (req, res) => {
   const userId = parseInt(req.params.id, 10);
@@ -115,9 +72,6 @@ const deleteUser = (req, res) => {
 
 export {
   getUsers,
-  getUserById,
-  getUserByUsername,
-  getUserByEmail,
   createUser,
   updateUser,
   deleteUser,
