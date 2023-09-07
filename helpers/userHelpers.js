@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/extensions
 import prisma from '../db/index.js';
 
 // Get user by username
@@ -48,4 +49,4 @@ const getUserById = async (req, res) => {
   return res.json({ findUser });
 };
 
-export { getUserByUsername,getUserById,getUserByEmail}
+export { getUserByUsername, getUserById, getUserByEmail };
