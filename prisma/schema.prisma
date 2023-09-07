@@ -15,6 +15,11 @@ enum Role {
   ADMIN
 }
 
+enum UserStatus {
+  Active
+  Inactive
+}
+
 enum AppointmentStatus {
   Scheduled
   Completed
@@ -52,6 +57,7 @@ model User {
   id         String      @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   user_name  String      @unique
   role       Role        @default(USER)
+  status     UserStatus  @default(Active)
   password   String
   //One to one relationship
   person     Person      @relation(fields: [person_id], references: [id])

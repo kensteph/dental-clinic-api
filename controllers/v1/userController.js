@@ -1,5 +1,11 @@
-// eslint-disable-next-line import/extensions
+/* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
+import {
+  getUserByEmail,
+  getUserById,
+  getUserByPhone,
+  getUserByUsername,
+} from '../../helpers/userHelpers.js';
 
 // Sample data (replace with your database interactions)
 const users = [
@@ -19,6 +25,19 @@ const createUser = async (req, res) => {
     firstname, lastname, email, phone, address, username,
   } = req.body;
 
+  // Verify if the username is already taken
+  if (await getUserByUsername(username)) {
+    return res.status(500).json({ message: 'Username is already taken.' });
+  }
+  // Verify if the email is already used
+  if (await getUserByEmail(email)) {
+    return res.status(500).json({ message: 'Email is already used.' });
+  }
+  // Verify if the phone is already used
+  if (await getUserByPhone(phone)) {
+    return res.status(500).json({ message: 'Phone is already used.' });
+  }
+
   try {
     const savedUser = await prisma.user.create({
       data: {
@@ -35,44 +54,31 @@ const createUser = async (req, res) => {
         },
       },
     });
-    res.status(201).json({ message: 'User created', user: savedUser });
+    return res.status(201).json({ message: 'User created', user: savedUser });
   } catch (error) {
-    res.status(500).json({ message: 'Fail to created the user' });
+    return res.status(500).json({ message: 'Fail to create the user' });
   }
 };
 
 // Update user by ID
-const updateUser = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const { name, email } = req.body;
-  const user = users.find((u) => u.id === userId);
-
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+const updateUserStatus = async (req, res) => {
+  const { userId, newStatus } = req.body;
+  // Verify if the phone is present
+  if (!(await getUserById(userId))) {
+    return res.status(500).json({ message: 'User not found.' });
   }
+  const updateOne = await prisma.user.update({
+    where: {
+      id: userId,
+    },
 
-  user.name = name || user.name;
-  user.email = email || user.email;
+    data: {
+      status: newStatus,
+    },
+  });
 
-  return res.json({ message: 'User updated', user });
+  if (updateOne) { return res.status(201).json({ message: 'User created', user: updateOne }); }
+  return res.status(500).json({ message: 'Fail to update the user' });
 };
 
-// Delete user by ID
-const deleteUser = (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-  const userIndex = users.findIndex((u) => u.id === userId);
-
-  if (userIndex === -1) {
-    return res.status(404).json({ message: 'User not found' });
-  }
-
-  users.splice(userIndex, 1);
-  return res.json({ message: 'User deleted' });
-};
-
-export {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-};
+export { getUsers, createUser, updateUserStatus };

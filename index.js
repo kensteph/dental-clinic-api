@@ -1,7 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unresolved */
-
+/* eslint-disable import/extensions */
 import express from 'express';
 import { userRoutes } from './routes/v1/index.js';
 
