@@ -1,11 +1,23 @@
 /* eslint-disable import/extensions */
-import { hashPassword } from '../../helpers/authHelpers.js';
+import { verifyPassword } from '../../helpers/authHelpers.js';
+import { getUserByUsername } from '../../helpers/userHelpers.js';
 
 const login = (req, res) => {
   const { username, password } = req.body;
-  const hash = hashPassword(password);
-  console.log('HASH : ', hash);
-  return res.status(200).json({ message: `${username} Succesfully login...` });
+  // Verify user
+  const user = getUserByUsername(username);
+  if (user) {
+    // Verify password
+    const verifyPass = verifyPassword(password, user.password);
+    if (verifyPass) {
+      return res
+        .status(200)
+        .json({ message: `${username} Succesfully login...` });
+    }
+  }
+  return res
+    .status(500)
+    .json({ message: 'Username or password is incorrect.' });
 };
 
 const refreshToken = (req, res) => {
