@@ -1,5 +1,6 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
+import { hashPassword } from '../../helpers/authHelpers.js';
 import {
   getUserByEmail,
   getUserById,
@@ -20,10 +21,10 @@ const getUsers = (req, res) => {
 
 // Create a new user
 const createUser = async (req, res) => {
-  const password = 'werrrrwwq';
-  const {
-    firstname, lastname, email, phone, address, username,
-  } = req.body;
+  const { firstname, lastname, email, phone, address, username, password } =
+    req.body;
+
+  const hash = hashPassword(password);
 
   // Verify if the username is already taken
   if (await getUserByUsername(username)) {
@@ -42,7 +43,7 @@ const createUser = async (req, res) => {
     const savedUser = await prisma.user.create({
       data: {
         user_name: username,
-        password,
+        password: hash,
         person: {
           create: {
             first_name: firstname,
@@ -77,7 +78,9 @@ const updateUserStatus = async (req, res) => {
     },
   });
 
-  if (updateOne) { return res.status(201).json({ message: 'User created', user: updateOne }); }
+  if (updateOne) {
+    return res.status(201).json({ message: 'User created', user: updateOne });
+  }
   return res.status(500).json({ message: 'Fail to update the user' });
 };
 

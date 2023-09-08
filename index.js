@@ -1,6 +1,6 @@
 /* eslint-disable import/extensions */
 import express from 'express';
-import { userRoutes } from './routes/v1/index.js';
+import { authRoutes, userRoutes } from './routes/v1/index.js';
 
 const app = express();
 
@@ -9,6 +9,7 @@ const app = express();
 app.use(express.json());
 // ========== ROUTES ===============
 app.use(userRoutes);
+app.use(authRoutes);
 
 const PORT = process.env.PORT || 8788;
 
