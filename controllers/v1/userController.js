@@ -1,6 +1,6 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
-import { hashPassword } from '../../helpers/authHelpers.js';
+import { hashPassword, verifyToken } from '../../helpers/authHelpers.js';
 import {
   getUserByEmail,
   getUserById,
@@ -16,13 +16,25 @@ const users = [
 
 // Get all users
 const getUsers = (req, res) => {
-  res.json({ users });
+  // get the token
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+  // Verify the provided token
+  const verification = verifyToken(token);
+  if (!verification) {
+    return res.status(401).json({ message: 'You are not authorized!' });
+  }
+  return res.json({ users });
 };
 
 // Create a new user
 const createUser = async (req, res) => {
-  const { firstname, lastname, email, phone, address, username, password } =
-    req.body;
+  const {
+    firstname, lastname, email, phone, address, username, password,
+  } = req.body;
 
   const hash = hashPassword(password);
 

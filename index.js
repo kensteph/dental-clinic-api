@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import 'dotenv/config.js';
 import express from 'express';
 import { authRoutes, userRoutes } from './routes/v1/index.js';
 

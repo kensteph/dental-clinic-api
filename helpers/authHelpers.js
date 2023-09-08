@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Hash user password
 const hashPassword = (plainPassword) => {
@@ -11,9 +12,18 @@ const hashPassword = (plainPassword) => {
 
 // Verify or compare password
 const verifyPassword = (plainPassword, hashPasswordFromDb) => {
-  console.log({ plainPassword, hashPasswordFromDb });
   const ifVerify = bcrypt.compareSync(plainPassword, hashPasswordFromDb);
   return ifVerify;
 };
 
-export { hashPassword, verifyPassword };
+// Verify if token is valid
+const verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    return decoded;
+  } catch (error) {
+    return false;
+  }
+};
+
+export { hashPassword, verifyPassword, verifyToken };

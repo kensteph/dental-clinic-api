@@ -1,7 +1,7 @@
 /* eslint-disable import/extensions */
+import jwt from 'jsonwebtoken';
 import { verifyPassword } from '../../helpers/authHelpers.js';
 import { getUserByUsername } from '../../helpers/userHelpers.js';
-import jwt from 'jso'
 
 const login = async (req, res) => {
   const { username, password } = req.body;
@@ -11,17 +11,14 @@ const login = async (req, res) => {
     // Verify password
     const verifyPass = verifyPassword(password, user.password);
     if (verifyPass) {
+      const payload = { userId: user.id, username: user.user_name };
       // Create a JWT token
-      const token = jwt.sign(
-        { userId: user.id, username: user.username },
-        secretKey,
-        {
-          expiresIn: '1h', // Token expires in 1 hour
-        }
-      );
+      const token = jwt.sign(payload, process.env.SECRET_KEY, {
+        expiresIn: '1h', // Token expires in 1 hour
+      });
       return res
         .status(200)
-        .json({ message: `${username} Succesfully login...` });
+        .json({ message: `${username} Succesfully login...`, token });
     }
   }
   return res
@@ -29,8 +26,5 @@ const login = async (req, res) => {
     .json({ message: 'Username or password is incorrect.' });
 };
 
-const refreshToken = (req, res) => {
-  console.log('REFRESH TOKEN....');
-};
-
-export { login, refreshToken };
+// eslint-disable-next-line import/prefer-default-export
+export { login };
