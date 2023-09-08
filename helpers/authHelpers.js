@@ -11,7 +11,9 @@ const hashPassword = (plainPassword) => {
 
 // Verify or compare password
 const verifyPassword = (plainPassword, hashPasswordFromDb) => {
-  bcrypt.compareSync(plainPassword, hashPasswordFromDb);
+  console.log({ plainPassword, hashPasswordFromDb });
+  const ifVerify = bcrypt.compareSync(plainPassword, hashPasswordFromDb);
+  return ifVerify;
 };
 
 export { hashPassword, verifyPassword };
