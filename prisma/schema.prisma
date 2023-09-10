@@ -15,6 +15,11 @@ enum Role {
   ADMIN
 }
 
+enum UserStatus {
+  Active
+  Inactive
+}
+
 enum AppointmentStatus {
   Scheduled
   Completed
@@ -32,7 +37,8 @@ model Person {
   id         String   @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   first_name String
   last_name  String
-  phone      String
+  email      String   @unique // @unique sets the field as unique
+  phone      String   @unique // @unique sets the field as unique
   address    String
   createdAt  DateTime @default(now()) //default value (now)
   updatedAt  DateTime @updatedAt //auto update this field on update
@@ -44,13 +50,15 @@ model Person {
 
   //LOCK LEVEL ATTRIBUTE
   @@index([phone]) // index this field for faster queries when filtering and sorting
+  @@index([email]) // index this field for faster queries when filtering and sorting
 }
 
 model User {
   id         String      @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
-  email      String      @unique // @unique sets the field as unique
   user_name  String      @unique
   role       Role        @default(USER)
+  status     UserStatus  @default(Active)
+  password   String
   //One to one relationship
   person     Person      @relation(fields: [person_id], references: [id])
   person_id  String      @unique
@@ -61,7 +69,6 @@ model User {
   evolutions Evolution[]
 
   //LOCK LEVEL ATTRIBUTE
-  @@index([email]) // index this field for faster queries when filtering and sorting
   @@index([user_name]) // index this field for faster queries when filtering and sorting
 }
 

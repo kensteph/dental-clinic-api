@@ -1,15 +1,16 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-unresolved */
-
+/* eslint-disable import/extensions */
+import 'dotenv/config.js';
 import express from 'express';
-// ========== ROUTES ===============
+import { authRoutes, userRoutes } from './routes/v1/index.js';
 
 const app = express();
 
 // ========== MIDDLEWARES ==============
 // Middleware for parsing JSON in requests
 app.use(express.json());
+// ========== ROUTES ===============
+app.use(userRoutes);
+app.use(authRoutes);
 
 const PORT = process.env.PORT || 8788;
 
