@@ -1,7 +1,11 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
-import { getUserByEmail, getUserByPhone } from '../../helpers/userHelpers.js';
+import {
+  getPatientById,
+  getUserByEmail,
+  getUserByPhone,
+} from '../../helpers/userHelpers.js';
 
 const createPatient = async (req, res) => {
   const {
@@ -66,15 +70,15 @@ const getPatients = async (req, res) => {
 // Update user by ID
 const updatePatient = async (req, res) => {
   const {
-    firstname, lastname, email, phone, address, idperson,
+    firstname, lastname, email, phone, address, id,
   } = req.body;
-  // // Verify if the phone is present
-  // if (!(await getUserById(userId))) {
-  //   return res.status(500).json({ message: 'User not found.' });
-  // }
+  // Verify if the patient is present
+  if (!(await getPatientById(id))) {
+    return res.status(500).json({ message: 'Patient not found.' });
+  }
   const updateOne = await prisma.person.update({
     where: {
-      id: idperson,
+      id,
     },
 
     data: {
@@ -89,7 +93,7 @@ const updatePatient = async (req, res) => {
   if (updateOne) {
     return res
       .status(201)
-      .json({ message: 'Patient created', patient: updateOne });
+      .json({ message: 'Patient updated successfully.', patient: updateOne });
   }
   return res.status(500).json({ message: 'Fail to update the patient' });
 };
