@@ -98,4 +98,35 @@ const updatePatient = async (req, res) => {
   return res.status(500).json({ message: 'Fail to update the patient' });
 };
 
-export { createPatient, updatePatient, getPatients };
+// Delete Patient
+const deletePatient = async (req, res) => {
+  const { id } = req.body;
+  // Verify if the patient is present
+  if (!(await getPatientById(id))) {
+    return res.status(500).json({ message: 'Patient not found.' });
+  }
+  const deletePatient = prisma.patient.delete({
+    where: {
+      person_id: id,
+    },
+  });
+
+  const deletePerson = prisma.person.delete({
+    where: {
+      id,
+    },
+  });
+
+  const transaction = await prisma.$transaction([deletePatient, deletePerson]);
+
+  if (transaction) {
+    return res
+      .status(201)
+      .json({ message: 'Patient deleted successfully.', patient: transaction });
+  }
+  return res.status(500).json({ message: 'Fail to update the patient' });
+};
+
+export {
+  createPatient, updatePatient, getPatients, deletePatient,
+};
