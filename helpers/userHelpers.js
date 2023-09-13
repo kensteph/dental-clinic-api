@@ -41,6 +41,16 @@ const getUserById = async (id) => {
   return findUser;
 };
 
+// Get patient by ID
+const getPatientById = async (id) => {
+  const patientFound = await prisma.person.findUnique({
+    where: {
+      id,
+    },
+  });
+  return patientFound;
+};
+
 export {
-  getUserByUsername, getUserById, getUserByEmail, getUserByPhone,
+  getUserByUsername, getUserById, getUserByEmail, getUserByPhone, getPatientById,
 };
