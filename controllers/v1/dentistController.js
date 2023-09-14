@@ -5,7 +5,7 @@ import { getPersonById, getPersonByEmail, getPersonByPhone } from '../../helpers
 
 const createDentist = async (req, res) => {
   const {
-    firstname, lastname, email, phone, address,
+    firstname, lastname, email, phone, address, specialization,
   } = req.body;
 
   // Verify if the email is already used
@@ -20,6 +20,7 @@ const createDentist = async (req, res) => {
   try {
     const savedDentist = await prisma.dentist.create({
       data: {
+        specialization,
         person: {
           create: {
             first_name: firstname,
@@ -35,7 +36,7 @@ const createDentist = async (req, res) => {
       .status(201)
       .json({ message: 'Dentist created', Dentist: savedDentist });
   } catch (error) {
-    return res.status(500).json({ message: 'Fail to create the dentist.' });
+    return res.status(500).json({ message: 'Fail to create the dentist.', error });
   }
 };
 
