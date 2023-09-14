@@ -1,21 +1,19 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
-import {
-  getDentistById,
-  getUserByEmail,
-  getUserByPhone,
-} from '../../helpers/userHelpers.js';
+import { getPersonById, getPersonByEmail, getPersonByPhone } from '../../helpers/userHelpers.js';
 
 const createDentist = async (req, res) => {
-  const { firstname, lastname, email, phone, address } = req.body;
+  const {
+    firstname, lastname, email, phone, address,
+  } = req.body;
 
   // Verify if the email is already used
-  if (await getUserByEmail(email)) {
+  if (await getPersonByEmail(email)) {
     return res.status(500).json({ message: 'Email is already used.' });
   }
   // Verify if the phone is already used
-  if (await getUserByPhone(phone)) {
+  if (await getPersonByPhone(phone)) {
     return res.status(500).json({ message: 'Phone is already used.' });
   }
 
@@ -67,9 +65,11 @@ const getDentists = async (req, res) => {
 
 // Update user by ID
 const updateDentist = async (req, res) => {
-  const { firstname, lastname, email, phone, address, id } = req.body;
+  const {
+    firstname, lastname, email, phone, address, id,
+  } = req.body;
   // Verify if the dentist is present
-  if (!(await getDentistById(id))) {
+  if (!(await getPersonById(id))) {
     return res.status(500).json({ message: 'Dentist not found.' });
   }
   const updateOne = await prisma.person.update({
@@ -98,7 +98,7 @@ const updateDentist = async (req, res) => {
 const deleteDentist = async (req, res) => {
   const { id } = req.body;
   // Verify if the dentist is present
-  if (!(await getDentistById(id))) {
+  if (!(await getPersonById(id))) {
     return res.status(500).json({ message: 'Dentist not found.' });
   }
   const deleteDentist = prisma.dentist.delete({
@@ -123,4 +123,6 @@ const deleteDentist = async (req, res) => {
   return res.status(500).json({ message: 'Fail to update the dentist' });
 };
 
-export { createDentist, updateDentist, getDentists, deleteDentist };
+export {
+  createDentist, updateDentist, getDentists, deleteDentist,
+};

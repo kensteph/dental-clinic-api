@@ -2,9 +2,9 @@
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
 import {
-  getPatientById,
-  getUserByEmail,
-  getUserByPhone,
+  getPersonById,
+  getPersonByEmail,
+  getPersonByPhone,
 } from '../../helpers/userHelpers.js';
 
 const createPatient = async (req, res) => {
@@ -13,11 +13,11 @@ const createPatient = async (req, res) => {
   } = req.body;
 
   // Verify if the email is already used
-  if (await getUserByEmail(email)) {
+  if (await getPersonByEmail(email)) {
     return res.status(500).json({ message: 'Email is already used.' });
   }
   // Verify if the phone is already used
-  if (await getUserByPhone(phone)) {
+  if (await getPersonByPhone(phone)) {
     return res.status(500).json({ message: 'Phone is already used.' });
   }
 
@@ -73,7 +73,7 @@ const updatePatient = async (req, res) => {
     firstname, lastname, email, phone, address, id,
   } = req.body;
   // Verify if the patient is present
-  if (!(await getPatientById(id))) {
+  if (!(await getPersonById(id))) {
     return res.status(500).json({ message: 'Patient not found.' });
   }
   const updateOne = await prisma.person.update({
@@ -102,7 +102,7 @@ const updatePatient = async (req, res) => {
 const deletePatient = async (req, res) => {
   const { id } = req.body;
   // Verify if the patient is present
-  if (!(await getPatientById(id))) {
+  if (!(await getPersonById(id))) {
     return res.status(500).json({ message: 'Patient not found.' });
   }
   const deletePatient = prisma.patient.delete({

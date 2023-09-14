@@ -12,7 +12,7 @@ const getUserByUsername = async (username) => {
 };
 
 // Get user by email
-const getUserByEmail = async (email) => {
+const getPersonByEmail = async (email) => {
   const findUser = await prisma.person.findUnique({
     where: {
       email,
@@ -22,7 +22,7 @@ const getUserByEmail = async (email) => {
 };
 
 // Get user by phone
-const getUserByPhone = async (phone) => {
+const getPersonByPhone = async (phone) => {
   const findUser = await prisma.person.findUnique({
     where: {
       phone,
@@ -31,26 +31,16 @@ const getUserByPhone = async (phone) => {
   return findUser;
 };
 
-// Get user by ID
-const getUserById = async (id) => {
-  const findUser = await prisma.user.findUnique({
+// Get person by ID
+const getPersonById = async (id) => {
+  const personFound = await prisma.person.findUnique({
     where: {
       id,
     },
   });
-  return findUser;
-};
-
-// Get patient by ID
-const getPatientById = async (id) => {
-  const patientFound = await prisma.person.findUnique({
-    where: {
-      id,
-    },
-  });
-  return patientFound;
+  return personFound;
 };
 
 export {
-  getUserByUsername, getUserById, getUserByEmail, getUserByPhone, getPatientById,
+  getUserByUsername, getPersonByEmail, getPersonByPhone, getPersonById,
 };
