@@ -45,7 +45,7 @@ model Person {
   //One to one relationship
   user       User?
   patient    Patient?
-  Dentist    Dentist?
+  dentist    Dentist?
   Staff      Staff?
 
   //LOCK LEVEL ATTRIBUTE
@@ -81,7 +81,6 @@ model Patient {
   updatedAt    DateTime      @updatedAt //auto update this field on update
   //One to Many
   appointments Appointment[]
-  dentists     Dentist[]
   Treatment    Treatment[]
 }
 
@@ -93,10 +92,8 @@ model Dentist {
   specialization String
   createdAt      DateTime     @default(now()) //default value (now)
   updatedAt      DateTime     @updatedAt //auto update this field on update
-  Patient        Patient      @relation(fields: [patientId], references: [id])
-  patientId      String
-  Appointment    Appointment?
-  Treatment      Treatment?
+  appointment    Appointment?
+  treatment      Treatment?
 }
 
 model Staff {
@@ -139,7 +136,7 @@ model Treatment {
   dentist_id            String          @unique
   //one to many
   evolutions            Evolution[]
-  Payment               Payment[]
+  payment               Payment[]
 }
 
 model Evolution {
@@ -150,7 +147,7 @@ model Evolution {
   //One to one relationship
   user        User      @relation(fields: [user_id], references: [id])
   user_id     String    @unique
-  Treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  treatment   Treatment @relation(fields: [treatmentId], references: [id])
   treatmentId String
 }
 
@@ -163,6 +160,6 @@ model Payment {
   //One to one relationship
   user        User      @relation(fields: [user_id], references: [id])
   user_id     String    @unique
-  Treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  treatment   Treatment @relation(fields: [treatmentId], references: [id])
   treatmentId String
 }
