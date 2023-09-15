@@ -85,15 +85,15 @@ model Patient {
 }
 
 model Dentist {
-  id             String       @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  id             String        @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   //One to one relationship
-  person         Person       @relation(fields: [person_id], references: [id])
-  person_id      String       @unique
+  person         Person        @relation(fields: [person_id], references: [id])
+  person_id      String        @unique
   specialization String
-  createdAt      DateTime     @default(now()) //default value (now)
-  updatedAt      DateTime     @updatedAt //auto update this field on update
-  appointment    Appointment?
-  treatment      Treatment?
+  createdAt      DateTime      @default(now()) //default value (now)
+  updatedAt      DateTime      @updatedAt //auto update this field on update
+  appointment    Appointment[]
+  treatment      Treatment[]
 }
 
 model Staff {
@@ -108,7 +108,6 @@ model Staff {
 
 model Appointment {
   id               String            @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
-  specialization   String
   appointment_date DateTime
   description      String
   status           AppointmentStatus @default(Scheduled)
@@ -116,9 +115,9 @@ model Appointment {
   updatedAt        DateTime          @updatedAt //auto update this field on update
   //One to one relationship
   patient          Patient           @relation(fields: [patient_id], references: [id])
-  patient_id       String            @unique
+  patient_id       String
   dentist          Dentist           @relation(fields: [dentist_id], references: [id])
-  dentist_id       String            @unique
+  dentist_id       String
 }
 
 model Treatment {

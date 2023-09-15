@@ -8,14 +8,8 @@ import {
   getUserByUsername,
 } from '../../helpers/userHelpers.js';
 
-// Sample data (replace with your database interactions)
-const users = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 10, name: 'Jane Smith', email: 'jane@example.com' },
-];
-
 // Get all users
-const getUsers = (req, res) => {
+const getUsers = async (req, res) => {
   // get the token
   const token = req.header('Authorization');
 
@@ -27,6 +21,17 @@ const getUsers = (req, res) => {
   if (!verification) {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
+  // find all users
+  const users = await prisma.person.findMany({
+    where: {
+      user: {
+        isNot: null,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
   return res.json({ users });
 };
 

@@ -63,6 +63,9 @@ const getPatients = async (req, res) => {
         isNot: null,
       },
     },
+    include: {
+      patient: true,
+    },
   });
   return res.json({ patients });
 };
