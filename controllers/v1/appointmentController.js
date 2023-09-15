@@ -8,7 +8,9 @@ import {
 } from '../../helpers/userHelpers.js';
 
 const createAppointment = async (req, res) => {
-  const { firstname, lastname, email, phone, address } = req.body;
+  const {
+    firstname, lastname, email, phone, address,
+  } = req.body;
 
   // Verify if the email is already used
   if (await getPersonByEmail(email)) {
@@ -67,7 +69,9 @@ const getAppointments = async (req, res) => {
 
 // Update user by ID
 const updateAppointment = async (req, res) => {
-  const { firstname, lastname, email, phone, address, id } = req.body;
+  const {
+    firstname, lastname, email, phone, address, id,
+  } = req.body;
   // Verify if the appointment is present
   if (!(await getPersonById(id))) {
     return res.status(500).json({ message: 'Appointment not found.' });

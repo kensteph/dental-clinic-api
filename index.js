@@ -2,7 +2,11 @@
 import 'dotenv/config.js';
 import express from 'express';
 import {
-  authRoutes, dentistRoutes, patientRoutes, userRoutes,
+  appointmentRoutes,
+  authRoutes,
+  dentistRoutes,
+  patientRoutes,
+  userRoutes,
 } from './routes/v1/index.js';
 
 const app = express();
@@ -15,6 +19,7 @@ app.use(userRoutes);
 app.use(authRoutes);
 app.use(patientRoutes);
 app.use(dentistRoutes);
+app.use(appointmentRoutes);
 
 const PORT = process.env.PORT || 8788;
 

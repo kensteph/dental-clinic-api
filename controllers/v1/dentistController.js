@@ -1,7 +1,11 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
-import { getPersonById, getPersonByEmail, getPersonByPhone } from '../../helpers/userHelpers.js';
+import {
+  getPersonById,
+  getPersonByEmail,
+  getPersonByPhone,
+} from '../../helpers/userHelpers.js';
 
 const createDentist = async (req, res) => {
   const {
@@ -36,7 +40,9 @@ const createDentist = async (req, res) => {
       .status(201)
       .json({ message: 'Dentist created', Dentist: savedDentist });
   } catch (error) {
-    return res.status(500).json({ message: 'Fail to create the dentist.', error });
+    return res
+      .status(500)
+      .json({ message: 'Fail to create the dentist.', error });
   }
 };
 
@@ -59,6 +65,9 @@ const getDentists = async (req, res) => {
       dentist: {
         isNot: null,
       },
+    },
+    include: {
+      dentist: true,
     },
   });
   return res.json({ dentists });
