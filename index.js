@@ -6,6 +6,7 @@ import {
   authRoutes,
   dentistRoutes,
   patientRoutes,
+  treatmentRoutes,
   userRoutes,
 } from './routes/v1/index.js';
 
@@ -20,6 +21,7 @@ app.use(authRoutes);
 app.use(patientRoutes);
 app.use(dentistRoutes);
 app.use(appointmentRoutes);
+app.use(treatmentRoutes);
 
 const PORT = process.env.PORT || 8788;
 

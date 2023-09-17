@@ -33,6 +33,11 @@ enum TreatmentStatus {
   Canceled
 }
 
+enum Currency {
+  USD
+  HTG
+}
+
 model Person {
   id         String   @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   first_name String
@@ -121,10 +126,11 @@ model Appointment {
 }
 
 model TreatmentAvailable {
-  id                    BigInt             @id @default(autoincrement()) // @id sets the primary key id Int @id @default(autoincrement())
+  id                    Int                @id @default(autoincrement()) // @id sets the primary key id Int @id @default(autoincrement())
   name                  String             @unique
   procedure_description String
   cost                  Decimal
+  currency              Currency           @default(HTG)
   createdAt             DateTime           @default(now()) //default value (now)
   updatedAt             DateTime           @updatedAt //auto update this field on update
   TreatmentPatient      TreatmentPatient[]
@@ -142,7 +148,7 @@ model TreatmentPatient {
   patient         Patient            @relation(fields: [patient_id], references: [id])
   patient_id      String
   treatment_av    TreatmentAvailable @relation(fields: [treatment_av_id], references: [id])
-  treatment_av_id BigInt
+  treatment_av_id Int
   dentist         Dentist            @relation(fields: [dentist_id], references: [id])
   dentist_id      String
   //one to many

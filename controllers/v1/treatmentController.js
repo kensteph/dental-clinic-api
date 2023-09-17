@@ -1,7 +1,6 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
-import { getPersonById } from '../../helpers/userHelpers.js';
 
 const createTreatment = async (req, res) => {
   const { treatment, description, cost } = req.body;
@@ -36,26 +35,13 @@ const getTreatments = async (req, res) => {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
   // find all treatments
-  const treatments = await prisma.treatment.findMany({
-    include: {
-      patient: {
-        include: {
-          person: true,
-        },
-      },
-      dentist: {
-        include: {
-          person: true,
-        },
-      },
-    },
-  });
+  const treatments = await prisma.treatmentAvailable.findMany();
   return res.json({ treatments });
 };
 
 // Get all patient's treatments
-const getPatientTreatments = async (req, res) => {
-  const { patient } = req.params;
+const getSingleTreatment = async (req, res) => {
+  const { id } = req.params;
   // get the token
   const token = req.header('Authorization');
 
@@ -67,50 +53,45 @@ const getPatientTreatments = async (req, res) => {
   if (!verification) {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
-  // find all treatments
-  const treatments = await prisma.treatment.findMany({
-    include: {
-      dentist: {
-        include: {
-          person: true,
-        },
-      },
-    },
+  // find treatment
+  const treatment = await prisma.treatmentAvailable.findUnique({
     where: {
-      patient_id: patient,
+      id: parseInt(id, 10),
     },
   });
-  return res.json({ treatments });
+  return res.json({ treatment });
 };
 
 // Update patient's treatment
 const updateTreatment = async (req, res) => {
+  const { id } = req.params;
   const {
-    firstname, lastname, email, phone, address, id,
+    treatment, description, cost, currency,
   } = req.body;
-  // Verify if the treatment is present
-  if (!(await getPersonById(id))) {
-    return res.status(500).json({ message: 'Treatment not found.' });
-  }
-  const updateOne = await prisma.person.update({
-    where: {
-      id,
-    },
 
-    data: {
-      first_name: firstname,
-      last_name: lastname,
-      email,
-      phone,
-      address,
-    },
-  });
+  try {
+    const updateOne = await prisma.treatmentAvailable.update({
+      where: {
+        id: parseInt(id, 10),
+      },
 
-  if (updateOne) {
-    return res.status(201).json({
-      message: 'Treatment updated successfully.',
-      treatment: updateOne,
+      data: {
+        name: treatment,
+        procedure_description: description,
+        cost,
+        currency,
+      },
     });
+
+    if (updateOne) {
+      return res.status(201).json({
+        message: 'Treatment updated successfully.',
+        treatment: updateOne,
+      });
+    }
+  } catch (err) {
+    const error = err.meta.cause;
+    return res.status(500).json({ message: 'Fail to update the treatment', error });
   }
   return res.status(500).json({ message: 'Fail to update the treatment' });
 };
@@ -119,9 +100,9 @@ const updateTreatment = async (req, res) => {
 const deleteTreatment = async (req, res) => {
   const { id } = req.params;
   try {
-    const deleteTreatment = await prisma.treatment.delete({
+    const deleteTreatment = await prisma.treatmentAvailable.delete({
       where: {
-        id,
+        id: parseInt(id, 10),
       },
     });
 
@@ -132,7 +113,9 @@ const deleteTreatment = async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Fail to delete the treatment.Treatment should be not exist.' });
+    return res.status(500).json({
+      message: 'Fail to delete the treatment.Treatment should be not exist.',
+    });
   }
   return res.status(500).json({ message: 'Fail to delete the treatment.' });
 };
@@ -142,5 +125,5 @@ export {
   updateTreatment,
   getTreatments,
   deleteTreatment,
-  getPatientTreatments,
+  getSingleTreatment,
 };
