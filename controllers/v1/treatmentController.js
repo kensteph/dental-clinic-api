@@ -4,16 +4,14 @@ import { verifyToken } from '../../helpers/authHelpers.js';
 import { getPersonById } from '../../helpers/userHelpers.js';
 
 const createTreatment = async (req, res) => {
-  const { dentist } = req.params;
-  const { treatmentDate, description, patient } = req.body;
+  const { treatment, description, cost } = req.body;
 
   try {
-    const savedTreatment = await prisma.treatment.create({
+    const savedTreatment = await prisma.treatmentAvailable.create({
       data: {
-        patient_id: patient,
-        dentist_id: dentist,
-        treatment_date: new Date(treatmentDate),
-        description,
+        name: treatment,
+        procedure_description: description,
+        cost,
       },
     });
     return res
