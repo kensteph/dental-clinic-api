@@ -73,27 +73,27 @@ model User {
 }
 
 model Patient {
-  id           String        @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  id           String             @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   //One to one relationship
-  person       Person        @relation(fields: [person_id], references: [id])
-  person_id    String        @unique
-  createdAt    DateTime      @default(now()) //default value (now)
-  updatedAt    DateTime      @updatedAt //auto update this field on update
+  person       Person             @relation(fields: [person_id], references: [id])
+  person_id    String             @unique
+  createdAt    DateTime           @default(now()) //default value (now)
+  updatedAt    DateTime           @updatedAt //auto update this field on update
   //One to Many
   appointments Appointment[]
-  Treatment    Treatment[]
+  treatment    TreatmentPatient[]
 }
 
 model Dentist {
-  id             String        @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  id             String             @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   //One to one relationship
-  person         Person        @relation(fields: [person_id], references: [id])
-  person_id      String        @unique
+  person         Person             @relation(fields: [person_id], references: [id])
+  person_id      String             @unique
   specialization String
-  createdAt      DateTime      @default(now()) //default value (now)
-  updatedAt      DateTime      @updatedAt //auto update this field on update
+  createdAt      DateTime           @default(now()) //default value (now)
+  updatedAt      DateTime           @updatedAt //auto update this field on update
   appointment    Appointment[]
-  treatment      Treatment[]
+  treatment      TreatmentPatient[]
 }
 
 model Staff {
@@ -120,45 +120,57 @@ model Appointment {
   dentist_id       String
 }
 
-model Treatment {
-  id                    String          @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
-  treatment_date        DateTime
+model TreatmentAvailable {
+  id                    BigInt             @id @default(autoincrement()) // @id sets the primary key id Int @id @default(autoincrement())
+  name                  String             @unique
   procedure_description String
-  status                TreatmentStatus @default(Scheduled)
   cost                  Decimal
-  createdAt             DateTime        @default(now()) //default value (now)
-  updatedAt             DateTime        @updatedAt //auto update this field on update
+  createdAt             DateTime           @default(now()) //default value (now)
+  updatedAt             DateTime           @updatedAt //auto update this field on update
+  TreatmentPatient      TreatmentPatient[]
+}
+
+model TreatmentPatient {
+  id              String             @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  treatment_date  DateTime
+  status          TreatmentStatus    @default(Scheduled)
+  discount        Decimal
+  final_cost      Decimal
+  createdAt       DateTime           @default(now()) //default value (now)
+  updatedAt       DateTime           @updatedAt //auto update this field on update
   //One to one relationship
-  patient               Patient         @relation(fields: [patient_id], references: [id])
-  patient_id            String          @unique
-  dentist               Dentist         @relation(fields: [dentist_id], references: [id])
-  dentist_id            String          @unique
+  patient         Patient            @relation(fields: [patient_id], references: [id])
+  patient_id      String
+  treatment_av    TreatmentAvailable @relation(fields: [treatment_av_id], references: [id])
+  treatment_av_id BigInt
+  dentist         Dentist            @relation(fields: [dentist_id], references: [id])
+  dentist_id      String
   //one to many
-  evolutions            Evolution[]
-  payment               Payment[]
+  evolutions      Evolution[]
+  payment         Payment[]
 }
 
 model Evolution {
-  id          String    @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  id          String           @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   comment     String
-  createdAt   DateTime  @default(now()) //default value (now)
-  updatedAt   DateTime  @updatedAt //auto update this field on update
+  createdAt   DateTime         @default(now()) //default value (now)
+  updatedAt   DateTime         @updatedAt //auto update this field on update
   //One to one relationship
-  user        User      @relation(fields: [user_id], references: [id])
-  user_id     String    @unique
-  treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  user        User             @relation(fields: [user_id], references: [id])
+  user_id     String           @unique
+  treatment   TreatmentPatient @relation(fields: [treatmentId], references: [id])
   treatmentId String
 }
 
 model Payment {
-  id          String    @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
+  id          String           @id @default(uuid()) // @id sets the primary key id Int @id @default(autoincrement())
   amount      Decimal
   comment     String
-  createdAt   DateTime  @default(now()) //default value (now)
-  updatedAt   DateTime  @updatedAt //auto update this field on update
+  createdAt   DateTime         @default(now()) //default value (now)
+  updatedAt   DateTime         @updatedAt //auto update this field on update
   //One to one relationship
-  user        User      @relation(fields: [user_id], references: [id])
-  user_id     String    @unique
-  treatment   Treatment @relation(fields: [treatmentId], references: [id])
+  user        User             @relation(fields: [user_id], references: [id])
+  user_id     String           @unique
+  treatment   TreatmentPatient @relation(fields: [treatmentId], references: [id])
   treatmentId String
 }
