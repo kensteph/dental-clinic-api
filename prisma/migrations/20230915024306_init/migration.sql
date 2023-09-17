@@ -2,6 +2,9 @@
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('Active', 'Inactive');
+
+-- CreateEnum
 CREATE TYPE "AppointmentStatus" AS ENUM ('Scheduled', 'Completed', 'Canceled');
 
 -- CreateEnum
@@ -12,6 +15,7 @@ CREATE TABLE "Person" (
     "id" TEXT NOT NULL,
     "first_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -23,9 +27,10 @@ CREATE TABLE "Person" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
     "user_name" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'USER',
+    "status" "UserStatus" NOT NULL DEFAULT 'Active',
+    "password" TEXT NOT NULL,
     "person_id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -50,7 +55,6 @@ CREATE TABLE "Dentist" (
     "specialization" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "patientId" TEXT NOT NULL,
 
     CONSTRAINT "Dentist_pkey" PRIMARY KEY ("id")
 );
@@ -69,7 +73,6 @@ CREATE TABLE "Staff" (
 -- CreateTable
 CREATE TABLE "Appointment" (
     "id" TEXT NOT NULL,
-    "specialization" TEXT NOT NULL,
     "appointment_date" TIMESTAMP(3) NOT NULL,
     "description" TEXT NOT NULL,
     "status" "AppointmentStatus" NOT NULL DEFAULT 'Scheduled',
@@ -122,19 +125,22 @@ CREATE TABLE "Payment" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Person_email_key" ON "Person"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Person_phone_key" ON "Person"("phone");
+
+-- CreateIndex
 CREATE INDEX "Person_phone_idx" ON "Person"("phone");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE INDEX "Person_email_idx" ON "Person"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_user_name_key" ON "User"("user_name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_person_id_key" ON "User"("person_id");
-
--- CreateIndex
-CREATE INDEX "User_email_idx" ON "User"("email");
 
 -- CreateIndex
 CREATE INDEX "User_user_name_idx" ON "User"("user_name");
@@ -174,9 +180,6 @@ ALTER TABLE "Patient" ADD CONSTRAINT "Patient_person_id_fkey" FOREIGN KEY ("pers
 
 -- AddForeignKey
 ALTER TABLE "Dentist" ADD CONSTRAINT "Dentist_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Dentist" ADD CONSTRAINT "Dentist_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "Patient"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Staff" ADD CONSTRAINT "Staff_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

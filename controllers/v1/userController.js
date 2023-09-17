@@ -2,20 +2,14 @@
 import { prisma } from '../../db/index.js';
 import { hashPassword, verifyToken } from '../../helpers/authHelpers.js';
 import {
-  getUserByEmail,
-  getUserById,
-  getUserByPhone,
+  getPersonByEmail,
+  getPersonById,
+  getPersonByPhone,
   getUserByUsername,
 } from '../../helpers/userHelpers.js';
 
-// Sample data (replace with your database interactions)
-const users = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 10, name: 'Jane Smith', email: 'jane@example.com' },
-];
-
 // Get all users
-const getUsers = (req, res) => {
+const getUsers = async (req, res) => {
   // get the token
   const token = req.header('Authorization');
 
@@ -27,6 +21,17 @@ const getUsers = (req, res) => {
   if (!verification) {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
+  // find all users
+  const users = await prisma.person.findMany({
+    where: {
+      user: {
+        isNot: null,
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
   return res.json({ users });
 };
 
@@ -43,11 +48,11 @@ const createUser = async (req, res) => {
     return res.status(500).json({ message: 'Username is already taken.' });
   }
   // Verify if the email is already used
-  if (await getUserByEmail(email)) {
+  if (await getPersonByEmail(email)) {
     return res.status(500).json({ message: 'Email is already used.' });
   }
   // Verify if the phone is already used
-  if (await getUserByPhone(phone)) {
+  if (await getPersonByPhone(phone)) {
     return res.status(500).json({ message: 'Phone is already used.' });
   }
 
@@ -77,7 +82,7 @@ const createUser = async (req, res) => {
 const updateUserStatus = async (req, res) => {
   const { userId, newStatus } = req.body;
   // Verify if the phone is present
-  if (!(await getUserById(userId))) {
+  if (!(await getPersonById(userId))) {
     return res.status(500).json({ message: 'User not found.' });
   }
   const updateOne = await prisma.user.update({
