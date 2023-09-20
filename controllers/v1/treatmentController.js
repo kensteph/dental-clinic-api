@@ -36,7 +36,8 @@ const getTreatments = async (req, res) => {
   }
   // find all treatments
   const treatments = await prisma.treatmentAvailable.findMany();
-  return res.json({ treatments });
+  const count = treatments.length;
+  return res.json({ count, treatments });
 };
 
 // Get all patient's treatments
