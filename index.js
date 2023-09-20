@@ -1,7 +1,14 @@
 /* eslint-disable import/extensions */
 import 'dotenv/config.js';
 import express from 'express';
-import { authRoutes, userRoutes } from './routes/v1/index.js';
+import {
+  appointmentRoutes,
+  authRoutes,
+  dentistRoutes,
+  patientRoutes,
+  treatmentRoutes,
+  userRoutes,
+} from './routes/v1/index.js';
 
 const app = express();
 
@@ -11,6 +18,10 @@ app.use(express.json());
 // ========== ROUTES ===============
 app.use(userRoutes);
 app.use(authRoutes);
+app.use(patientRoutes);
+app.use(dentistRoutes);
+app.use(appointmentRoutes);
+app.use(treatmentRoutes);
 
 const PORT = process.env.PORT || 8788;
 
