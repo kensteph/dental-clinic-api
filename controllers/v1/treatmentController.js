@@ -3,7 +3,9 @@ import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
 
 const createTreatment = async (req, res) => {
-  const { treatment, description, cost } = req.body;
+  const {
+    treatment, description, cost, currency,
+  } = req.body;
 
   try {
     const savedTreatment = await prisma.treatmentAvailable.create({
@@ -11,6 +13,7 @@ const createTreatment = async (req, res) => {
         name: treatment,
         procedure_description: description,
         cost,
+        currency,
       },
     });
     return res

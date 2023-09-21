@@ -13,7 +13,7 @@ const createPatientTreatment = async (req, res) => {
           procedure_description: description,
           cost,
         },
-      }
+      },
     );
     return res
       .status(201)
@@ -73,7 +73,9 @@ const getSinglePatientTreatment = async (req, res) => {
 // Update patient's patientTreatment
 const updatePatientTreatment = async (req, res) => {
   const { id } = req.params;
-  const { patientTreatment, description, cost, currency } = req.body;
+  const {
+    patientTreatment, description, cost, currency,
+  } = req.body;
 
   try {
     const updateOne = await prisma.patientTreatmentAvailable.update({
@@ -110,12 +112,11 @@ const updatePatientTreatment = async (req, res) => {
 const deletePatientTreatment = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletePatientTreatment =
-      await prisma.patientTreatmentAvailable.delete({
-        where: {
-          id: parseInt(id, 10),
-        },
-      });
+    const deletePatientTreatment = await prisma.patientTreatmentAvailable.delete({
+      where: {
+        id: parseInt(id, 10),
+      },
+    });
 
     if (deletePatientTreatment) {
       return res.status(201).json({
