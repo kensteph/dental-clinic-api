@@ -1,26 +1,38 @@
 /* eslint-disable import/extensions */
 import { prisma } from '../../db/index.js';
 import { verifyToken } from '../../helpers/authHelpers.js';
+import { getTreamentById } from '../../helpers/treatmentHelpers.js';
 
 const createPatientTreatment = async (req, res) => {
-  const { patientTreatment, description, cost } = req.body;
+  const {
+    treatmentId, patientId, dentistId, discount, treatmentDate,
+  } = req.body;
+  // Get info about the treatment
+  const treatmentInfo = await getTreamentById(treatmentId);
+  let finalCost = 0;
+  if (treatmentInfo) {
+    finalCost = treatmentInfo.cost - discount;
+  } else {
+    return res.status(500).json({
+      message: 'Fail to create the patientTreatment.Treatment not found',
+    });
+  }
 
   try {
-    const savedPatientTreatment = await prisma.patientTreatmentAvailable.create(
-      {
-        data: {
-          name: patientTreatment,
-          procedure_description: description,
-          cost,
-        },
+    const savedPatientTreatment = await prisma.treatmentPatient.create({
+      data: {
+        treatment_av_id: treatmentId,
+        patient_id: patientId,
+        dentist_id: dentistId,
+        discount,
+        treatment_date: new Date(treatmentDate),
+        final_cost: finalCost,
       },
-    );
-    return res
-      .status(201)
-      .json({
-        message: 'PatientTreatment created',
-        PatientTreatment: savedPatientTreatment,
-      });
+    });
+    return res.status(201).json({
+      message: 'PatientTreatment created',
+      PatientTreatment: savedPatientTreatment,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -42,7 +54,13 @@ const getPatientTreatments = async (req, res) => {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
   // find all patientTreatments
-  const patientTreatments = await prisma.patientTreatmentAvailable.findMany();
+  const patientTreatments = await prisma.treatmentPatient.findMany({
+    include: {
+      dentist: {
+        include: { person: true },
+      },
+    },
+  });
   const count = patientTreatments.length;
   return res.json({ count, patientTreatments });
 };
@@ -62,7 +80,7 @@ const getSinglePatientTreatment = async (req, res) => {
     return res.status(401).json({ message: 'You are not authorized!' });
   }
   // find patientTreatment
-  const patientTreatment = await prisma.patientTreatmentAvailable.findUnique({
+  const patientTreatment = await prisma.treatmentPatient.findUnique({
     where: {
       id: parseInt(id, 10),
     },
@@ -74,20 +92,32 @@ const getSinglePatientTreatment = async (req, res) => {
 const updatePatientTreatment = async (req, res) => {
   const { id } = req.params;
   const {
-    patientTreatment, description, cost, currency,
+    treatmentId, patientId, dentistId, discount, treatmentDate,
   } = req.body;
+  // Get info about the treatment
+  const treatmentInfo = await getTreamentById(treatmentId);
+  let finalCost = 0;
+  if (treatmentInfo) {
+    finalCost = treatmentInfo.cost - discount;
+  } else {
+    return res.status(500).json({
+      message: 'Fail to update the patient treatment.Treatment not found',
+    });
+  }
 
   try {
-    const updateOne = await prisma.patientTreatmentAvailable.update({
+    const updateOne = await prisma.treatmentPatient.update({
       where: {
-        id: parseInt(id, 10),
+        id,
       },
 
       data: {
-        name: patientTreatment,
-        procedure_description: description,
-        cost,
-        currency,
+        treatment_av_id: treatmentId,
+        patient_id: patientId,
+        dentist_id: dentistId,
+        discount,
+        treatment_date: new Date(treatmentDate),
+        final_cost: finalCost,
       },
     });
 
@@ -112,7 +142,7 @@ const updatePatientTreatment = async (req, res) => {
 const deletePatientTreatment = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletePatientTreatment = await prisma.patientTreatmentAvailable.delete({
+    const deletePatientTreatment = await prisma.treatmentPatient.delete({
       where: {
         id: parseInt(id, 10),
       },
